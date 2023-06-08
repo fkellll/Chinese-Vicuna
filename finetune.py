@@ -9,6 +9,7 @@ import transformers
 import argparse
 import warnings
 from huggingface_hub import snapshot_download
+import pkg_resources
 
 assert (
     "LlamaTokenizer" in transformers._import_structure["models.llama"]
@@ -50,9 +51,10 @@ LORA_ALPHA = 16
 LORA_DROPOUT = 0.05
 VAL_SET_SIZE = args.test_size #2000
 USE_8bit = True
+bitsandbytesversion = pkg_resources.get_distribution('bitsandbytes').version
 
 if USE_8bit is True:
-    assert bnb.__version__ >= '0.37.2', "Please downgrade bitsandbytes's version, for example: pip install bitsandbytes==0.37.2"
+    assert bitsandbytesversion >= '0.37.2', "Please downgrade bitsandbytes's version, for example: pip install bitsandbytes==0.37.2"
         
 TARGET_MODULES = [
     "q_proj",
