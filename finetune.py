@@ -53,6 +53,7 @@ VAL_SET_SIZE = args.test_size #2000
 USE_8bit = True
 bitsandbytesversion = pkg_resources.get_distribution('bitsandbytes').version
 print("bitsandbytesversion" + bitsandbytesversion)
+print("bitsandbytesversion" + bitsandbytesversion)
 if USE_8bit is True:
     assert bitsandbytesversion >= '0.37.2', "Please downgrade bitsandbytes's version, for example: pip install bitsandbytes==0.37.2"
         

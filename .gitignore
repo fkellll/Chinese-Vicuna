@@ -32,3 +32,4 @@ merge_lora_peft.py
 merge_lora_mannally.py
 test.py
 lora-Vicuna/
+venv
