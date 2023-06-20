@@ -20,4 +20,11 @@ tqdm==4.65.0
 transformers @ git+https://github.com/huggingface/transformers.git@0dcb46e7a4a9e587ba84ff35778ab4233a184c11
 trlx @ git+https://github.com/CarperAI/trlx.git@b91da7b03d8e9fa0c0d6dce10a8f2611aca3013f
 wandb==0.13.10
-triton==2.0.0
+#triton
+numpy
+rouge_score
+fire
+openai
+langchain
+unstructured
+pdf2image

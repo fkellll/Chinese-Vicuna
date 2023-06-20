@@ -27,6 +27,8 @@ import fire
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.document_loaders import TextLoader
 
+import openai
+openai.api_key = "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"
 
 def post_process_gpt3_response(num_prompt_instructions, response):
     if response is None:
@@ -226,7 +228,7 @@ def loadBook(source_folder_path, doc_split_temp_path):
     # 将数据转成 document 对象，每个文件会作为一个 document
     documents = loader.load()
     # 初始化加载器  MarkdownTextSplitter md的文档可以试一下
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=0)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=0)
     # 切割加载的 document
     split_docs = text_splitter.split_documents(documents)
     with open(doc_split_temp_path, 'w') as f:
@@ -382,7 +384,25 @@ def generateAnswerWithContent(content, preContent, question):
     return instruction_data
 
 
-def generate_qa(bookPath, qaPath):
+def save_process(bookPath, qaPath, start):
+    with open('datasets/book/book_temp.txt', 'w') as f:
+        f.write(f"{bookPath}\n{qaPath}\n{start}")
+
+        
+def load_process():
+    try:
+        with open('datasets/book/book_temp.txt', 'r') as f:
+            lines = f.readlines()
+            bookPath = lines[0].strip()
+            qaPath = lines[1].strip()
+            start = int(lines[2].strip())
+    except FileNotFoundError:
+        bookPath = 'datasets/book/book.txt'
+        qaPath = 'datasets/book/book_qa.jsonl'
+        start = 0
+    return bookPath, qaPath, start
+
+def generate_qa(bookPath, qaPath, start):
     split_id = 0
     ext = 'txt'
     bookName = os.path.splitext(os.path.basename(bookPath))[0]
@@ -391,12 +411,15 @@ def generate_qa(bookPath, qaPath):
     doc_split_temp_path = os.path.join(os.path.dirname(bookDir), bookName + '_plit.' + ext)
     loadBook(bookPath, doc_split_temp_path)
     next_merge_path = os.path.join(os.path.dirname(bookDir), bookName + '_merge.' + ext)
-    if os.path.getsize(doc_split_temp_path) < 500:
+    if os.path.getsize(doc_split_temp_path) < 300:
         need_merge = False
     else:
         need_merge = True
     with open(doc_split_temp_path, 'r') as f: # 打开文件
         for index, line in enumerate(f):
+            if index < start:
+                continue
+            save_process(bookPath, qaPath, index)
             data = json.loads(line.strip()) # 解析每一行
             content = data['content']
             # 生成总结的内容问题
@@ -422,9 +445,11 @@ def generate_qa(bookPath, qaPath):
                 with open(next_merge_path, 'a') as f:
                     f.write(merge_content + "\n")
 
-    if need_merge: generate_qa(next_merge_path, qaPath)
+    if need_merge: generate_qa(next_merge_path, qaPath, 0)
 
-generate_qa('datasets/book/book.txt', 'datasets/book/book_qa.jsonl')
+saveProcessPath = ''
+bookPath, qaPath, start = load_process() # 读取返回的值,没有设置默认值
+generate_qa(bookPath, qaPath, start)
 
 # if __name__ == "__main__":
 #     fire.Fire(main)

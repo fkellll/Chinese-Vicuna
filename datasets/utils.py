@@ -14,7 +14,6 @@ from openai import openai_object
 import copy
 import openai
 
-openai.api_key = "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"
 
 StrOrOpenAIObject = Union[str, openai_object.OpenAIObject]
 
